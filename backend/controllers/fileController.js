@@ -28,6 +28,7 @@ exports.handleFileUpload = async (req, res) => {
             process.env.NODE_ENV === "production"
                 ? `https://formatconvertorbackend-shashank-pants-projects.vercel.app/${outputFilePath}`
                 : `http://localhost:5000/${outputFilePath}`;
+        console.log("url is ",url)
 
         res.json({ downloadLink: url});
     } catch (err) {

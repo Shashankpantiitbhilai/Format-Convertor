@@ -50,6 +50,7 @@ const FileUpload = () => {
         }
       );
       setDownloadLink(res.data.downloadLink);
+      console.log(res.data)
     } catch (error) {
       console.error("Error uploading file:", error);
     } finally {
