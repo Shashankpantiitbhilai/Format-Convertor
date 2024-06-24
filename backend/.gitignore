@@ -4,10 +4,10 @@
 /node_modules
 /.pnp
 .pnp.js
-
+/output
 # testing
 /coverage
-
+/uploads
 # production
 /build
 
