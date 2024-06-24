@@ -36,7 +36,7 @@ exports.parseWordFile = (text) => {
 
 
 exports.generateTableWordFile = async (data, outputPath) => {
-
+console.log(outputPath)
     const doc = new Document({
         sections: [{
             properties: {},
@@ -140,6 +140,6 @@ exports.generateTableWordFile = async (data, outputPath) => {
     });
 
     const buffer = await Packer.toBuffer(doc);
-    console.log(buffer)
+  
     fs.writeFileSync(outputPath, buffer);
 };

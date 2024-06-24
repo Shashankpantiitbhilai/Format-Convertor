@@ -19,10 +19,10 @@ exports.handleFileUpload = async (req, res) => {
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, { recursive: true });
         }
-console.log(outputDir)
+
         const outputFilePath = path.join(outputDir, `${Date.now()}_output.docx`);
         await generateTableWordFile(parsedData, outputFilePath);
-
+        console.log(outputFilePath)
         const downloadUrl =
             process.env.NODE_ENV === "production"
                 ? `https://formatconvertor.vercel.app/output/${path.basename(outputFilePath)}`
