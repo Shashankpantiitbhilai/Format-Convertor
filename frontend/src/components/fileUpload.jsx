@@ -35,10 +35,13 @@ const FileUpload = () => {
     setLoading(true);
     const formData = new FormData();
     formData.append("file", file);
-
+    const url =
+      process.env.NODE_ENV === "production"
+        ? "https://formatconvertorbackend-shashank-pants-projects.vercel.app/api/files/upload"
+        : "http://localhost:5000/api/files/upload";
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/files/upload",
+       url,
         formData,
         {
           headers: {

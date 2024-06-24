@@ -22,8 +22,14 @@ exports.handleFileUpload = async (req, res) => {
 
         const outputFilePath = `${outputDir}/${Date.now()}_output.docx`;
         await generateTableWordFile(parsedData, outputFilePath);
-// fs.unlink(out)
-        res.json({ downloadLink: `http://localhost:5000/${outputFilePath}` });
+        // fs.unlink(out)
+        
+        const url =
+            process.env.NODE_ENV === "production"
+                ? `https://formatconvertorbackend-shashank-pants-projects.vercel.app/${outputFilePath}`
+                : `http://localhost:5000/${outputFilePath}`;
+
+        res.json({ downloadLink: url});
     } catch (err) {
         console.error('Error in handleFileUpload:', err);
         res.status(500).send(`Error processing file: ${err.message}`);
