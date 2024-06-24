@@ -22,12 +22,12 @@ exports.parseWordFile = (text) => {
         }
     }
 
-      if (currentQuestion) {
+    if (currentQuestion) {
         formattedQuestions.push(currentQuestion);
     }
 
     // Remove prefixes from each question and options array before returning
-     return formattedQuestions.map(item => {
+    return formattedQuestions.map(item => {
         item.question = item.question.replace(/^\d+\.\s*/, ''); // Remove question number prefix
         item.options = item.options.map(option => option.replace(/([a-z])/, '')); // Remove option prefix
         return item;
@@ -36,7 +36,7 @@ exports.parseWordFile = (text) => {
 
 
 exports.generateTableWordFile = async (data, outputPath) => {
-  
+
     const doc = new Document({
         sections: [{
             properties: {},
@@ -140,5 +140,6 @@ exports.generateTableWordFile = async (data, outputPath) => {
     });
 
     const buffer = await Packer.toBuffer(doc);
+    console.log(buffer)
     fs.writeFileSync(outputPath, buffer);
 };
