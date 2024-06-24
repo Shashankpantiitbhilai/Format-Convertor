@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { styled } from '@mui/system'
+import { styled } from "@mui/system";
 import {
   Button,
   CircularProgress,
@@ -29,7 +29,7 @@ const FileUpload = () => {
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
-     setDownloadLink("");
+    setDownloadLink("");
   };
 
   const handleFileUpload = async () => {
@@ -41,17 +41,13 @@ const FileUpload = () => {
         ? "https://formatconvertorbackend-shashank-pants-projects.vercel.app/api/files/upload"
         : "http://localhost:5000/api/files/upload";
     try {
-      const res = await axios.post(
-       url,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const res = await axios.post(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       setDownloadLink(res.data.downloadLink);
-      console.log(res.data)
+      console.log(res.data);
     } catch (error) {
       console.error("Error uploading file:", error);
     } finally {
@@ -98,6 +94,9 @@ const FileUpload = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
+            onClick={() => {
+              setDownloadLink("");
+            }}
           >
             Download Processed File
           </Button>
