@@ -36,7 +36,7 @@ exports.parseWordFile = (text) => {
 
 
 exports.generateTableWordFile = async (data, outputPath) => {
-    console.log(data,"data in word file")
+  
     const doc = new Document({
         sections: [{
             properties: {},

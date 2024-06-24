@@ -5,6 +5,8 @@ const fileRoutes = require('./routes/fileroutes');
 const path = require('path');
 const app = express();
 const PORT = 5000;
+const dotenv = require("dotenv")
+dotenv.config();
 const origin =
     process.env.NODE_ENV === "production"
         ? "https://formatconvertor.vercel.app"

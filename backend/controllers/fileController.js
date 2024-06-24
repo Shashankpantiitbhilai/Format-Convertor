@@ -14,11 +14,12 @@ exports.handleFileUpload = async (req, res) => {
         }
 
         // Use absolute path for output directory
-        const outputDir = path.join(__dirname, '..', 'output');
+        
+        const outputDir = process.env.NODE_ENV === 'development' ? path.join(__dirname,'..', 'output') : '/tmp/output';
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, { recursive: true });
         }
-
+console.log(outputDir)
         const outputFilePath = path.join(outputDir, `${Date.now()}_output.docx`);
         await generateTableWordFile(parsedData, outputFilePath);
 
