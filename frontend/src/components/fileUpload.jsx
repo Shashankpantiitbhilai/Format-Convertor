@@ -29,6 +29,7 @@ const FileUpload = () => {
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
+     setDownloadLink("");
   };
 
   const handleFileUpload = async () => {

@@ -36,7 +36,6 @@ exports.parseWordFile = (text) => {
 
 
 exports.generateTableWordFile = async (data, outputPath) => {
-console.log(outputPath)
     const doc = new Document({
         sections: [{
             properties: {},
@@ -52,7 +51,10 @@ console.log(outputPath)
                         insideVertical: { style: BorderStyle.SINGLE, size: 1 },
                     },
                     rows: data.flatMap((item, index) => {
-                        return [
+                        const rows = [];
+
+                        // Question row
+                        rows.push(
                             new TableRow({
                                 children: [
                                     new TableCell({
@@ -66,7 +68,11 @@ console.log(outputPath)
                                         columnSpan: 2,
                                     }),
                                 ],
-                            }),
+                            })
+                        );
+
+                        // Type row (assuming 'multiple_choice')
+                        rows.push(
                             new TableRow({
                                 children: [
                                     new TableCell({
@@ -80,12 +86,19 @@ console.log(outputPath)
                                         columnSpan: 2,
                                     }),
                                 ],
-                            }),
-                            ...item.options.map((option, optionIndex) => {
-                                const parts = option.split('\t');
-                                const optionText = parts[0] || "";
-                                const correctness = parts[1] || "";
-                                return new TableRow({
+                            })
+                        );
+
+                        // Options rows
+                        item.options.forEach((option, optionIndex) => {
+                            const parts = option.split('\t');
+                            const optionText = parts[0] || "";
+                            const correctness = parts[1] || "";
+
+                            const isCorrect = optionIndex === 0; // First option is correct
+
+                            rows.push(
+                                new TableRow({
                                     children: [
                                         new TableCell({
                                             children: [new Paragraph({ text: `Option`, alignment: AlignmentType.CENTER })],
@@ -97,13 +110,17 @@ console.log(outputPath)
                                             width: { size: 60, type: WidthType.PERCENTAGE },
                                         }),
                                         new TableCell({
-                                            children: [new Paragraph({ text: 'Incorrect', alignment: AlignmentType.CENTER })],
+                                            children: [new Paragraph({ text: isCorrect ? 'Correct' : 'Incorrect', alignment: AlignmentType.CENTER })],
                                             width: { size: 20, type: WidthType.PERCENTAGE },
                                             verticalAlign: VerticalAlign.CENTER,
                                         }),
                                     ],
-                                });
-                            }),
+                                })
+                            );
+                        });
+
+                        // Solution row
+                        rows.push(
                             new TableRow({
                                 children: [
                                     new TableCell({
@@ -117,7 +134,11 @@ console.log(outputPath)
                                         columnSpan: 2,
                                     }),
                                 ],
-                            }),
+                            })
+                        );
+
+                        // Marks row
+                        rows.push(
                             new TableRow({
                                 children: [
                                     new TableCell({
@@ -126,13 +147,22 @@ console.log(outputPath)
                                         verticalAlign: VerticalAlign.CENTER,
                                     }),
                                     new TableCell({
-                                        children: [new Paragraph(item.marks || "")],
-                                        width: { size: 80, type: WidthType.PERCENTAGE },
-                                        columnSpan: 2,
+                                        children: [new Paragraph(item.marks || "1")],
+                                        width: { size: 60, type: WidthType.PERCENTAGE },
+                                       
+                                    }),
+                                    new TableCell({
+                                        children: [new Paragraph(item.marks || "0.25")],
+                                        width: { size: 20, type: WidthType.PERCENTAGE },
+                                      
+                                        verticalAlign: VerticalAlign.CENTER,
+                                       
                                     }),
                                 ],
-                            }),
-                        ];
+                            })
+                        );
+
+                        return rows;
                     }),
                 }),
             ],
@@ -140,6 +170,5 @@ console.log(outputPath)
     });
 
     const buffer = await Packer.toBuffer(doc);
-  
     fs.writeFileSync(outputPath, buffer);
 };
