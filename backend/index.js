@@ -19,7 +19,13 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/output', express.static(path.join(__dirname, 'output')));
+const outputDir = process.env.NODE_ENV === 'development'
+    ? path.join('output')
+    : '/tmp/output';
+
+app.use('/output', express.static(outputDir));
+
+
 
 app.use('/api/files', fileRoutes);
 
