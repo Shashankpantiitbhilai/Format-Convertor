@@ -25,7 +25,7 @@ exports.handleFileUpload = async (req, res) => {
         console.log(outputFilePath)
         const downloadUrl =
             process.env.NODE_ENV === "production"
-                ? `https://formatconvertor.vercel.app/output/${path.basename(outputFilePath)}`
+                ? `https://formatconvertorbackend-shashank-pants-projects.vercel.app/output/${path.basename(outputFilePath)}`
                 : `http://localhost:5000/output/${path.basename(outputFilePath)}`;
 
         res.json({ downloadLink: downloadUrl });
