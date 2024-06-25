@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { styled } from "@mui/system";
+import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import {
   Button,
   CircularProgress,
@@ -10,16 +10,28 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 
-const UploadContainer = styled(Box)({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "20px",
-  padding: "40px",
-  borderRadius: "10px",
-  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-  backgroundColor: "#f5f5f5",
+// Create a custom theme with green-yellow options
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#388e3c", // Green color for primary elements
+    },
+    secondary: {
+      main: "#fbc02d", // Yellow color for secondary elements
+    },
+    error: {
+      main: "#f44336", // Red color for error states
+    },
+    background: {
+      default: "#f0f0f0", // Light gray background color
+    },
+  },
+  typography: {
+    h4: {
+      fontWeight: "bold",
+      color: "orange",
+    },
+  },
 });
 
 const FileUpload = () => {
@@ -56,54 +68,83 @@ const FileUpload = () => {
   };
 
   return (
-    <UploadContainer
-      component={motion.div}
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <Typography variant="h4" component="h1">
-        Upload your file
-      </Typography>
-      <TextField
-        type="file"
-        onChange={handleFileChange}
-        variant="outlined"
-        inputProps={{ style: { padding: "10px" } }}
-        sx={{ width: "300px" }}
-      />
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleFileUpload}
-        disabled={!file || loading}
-        component={motion.button}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
+    <ThemeProvider theme={theme}>
+      <StyledUploadContainer
+        component={motion.div}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
       >
-        {loading ? <CircularProgress size={24} /> : "Upload"}
-      </Button>
-      {downloadLink && (
-        <Box mt={2}>
-          <Button
-            variant="contained"
-            color="secondary"
-            href={downloadLink}
-            download
-            component={motion.a}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            onClick={() => {
-              setDownloadLink("");
-            }}
-          >
-            Download Processed File
-          </Button>
-        </Box>
-      )}
-    </UploadContainer>
+        <Typography variant="h4" component="h1">
+          Upload your file
+        </Typography>
+        <TextField
+          type="file"
+          onChange={handleFileChange}
+          variant="outlined"
+          inputProps={{ style: { padding: "10px" } }}
+          sx={{ width: "300px", backgroundColor: "white", borderRadius: "4px" }}
+        />
+        <StyledButton
+          variant="contained"
+          onClick={handleFileUpload}
+          disabled={!file || loading}
+          component={motion.button}
+          style={{ backgroundColor: "white" ,color:"black"}}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          {loading ? <CircularProgress size={24} /> : "Upload"}
+        </StyledButton>
+        {downloadLink && (
+          <Box mt={2}>
+            <StyledButton
+              variant="contained"
+              color="secondary"
+              href={downloadLink}
+              download
+              component={motion.a}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              onClick={() => {
+                setDownloadLink("");
+              }}
+              sx={{
+                backgroundColor: "orange",
+                "&:hover": { backgroundColor: "#e65100" },
+              }}
+            >
+              Download Processed File
+            </StyledButton>
+          </Box>
+        )}
+      </StyledUploadContainer>
+    </ThemeProvider>
   );
 };
+
+const StyledUploadContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "20px",
+  padding: "40px",
+  borderRadius: "10px",
+  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+  backgroundColor: theme.palette.primary.dark,
+  color: theme.palette.secondary.contrastText,
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  "&:hover": {
+    backgroundColor: theme.palette.primary.dark,
+  },
+  "&:disabled": {
+    backgroundColor: theme.palette.primary.light,
+  },
+}));
 
 export default FileUpload;

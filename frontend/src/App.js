@@ -27,6 +27,12 @@ const RootContainer = styled(Container)({
   paddingTop: theme.spacing(4), // Use theme spacing directly
 });
 
+const StyledHeading = styled(Typography)({
+  color: '#d4af37', // Dark yellow color
+  fontWeight: 'bold',
+  marginBottom: theme.spacing(3),
+});
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
@@ -36,9 +42,9 @@ function App() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Typography variant="h3" component="h1" gutterBottom color="primary">
-            Word to Table Converter
-          </Typography>
+          <StyledHeading variant="h3" component="h1" style={{ color:"#EE4E4E"}}>
+            EduGainer File Convertor
+          </StyledHeading>
         </motion.div>
         <FileUpload />
       </RootContainer>
