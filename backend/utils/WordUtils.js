@@ -7,20 +7,21 @@ exports.parseWordFile = (text) => {
 
     let currentQuestion = null;
 
-    for (let i = 0; i < questions.length; i++) {
-        // Remove numerical prefixes from questions (e.g., "1. ", "2. ")
-        let questionLine = questions[i].replace(/^\s*\d+\.\s*/, '');
-        if (questionLine.includes('?')) {
+    questions.forEach((line) => {
+        // Check if the line starts with a number followed by a period (e.g., "1. ", "2. ")
+        if (/^\s*\d+\.\s*/.test(line)) {
             if (currentQuestion) {
                 formattedQuestions.push(currentQuestion);
             }
+            // Remove numerical prefixes from questions (e.g., "1. ", "2. ")
+            let questionLine = line.replace(/^\s*\d+\.\s*/, '');
             currentQuestion = { question: questionLine, options: [] };
         } else if (currentQuestion) {
             // Remove any character prefixes enclosed in parentheses (e.g., "(a)", "(b)")
-            let optionLine = questions[i].replace(/^\s*\([a-zA-Z0-9]\)\s*/, '');
+            let optionLine = line.replace(/^\s*\([a-zA-Z0-9]\)\s*/, '');
             currentQuestion.options.push(optionLine);
         }
-    }
+    });
 
     if (currentQuestion) {
         formattedQuestions.push(currentQuestion);
@@ -29,14 +30,14 @@ exports.parseWordFile = (text) => {
     // Remove prefixes from each question and options array before returning
     return formattedQuestions.map(item => {
         item.question = item.question.replace(/^\d+\.\s*/, ''); // Remove question number prefix
-        item.options = item.options.map(option => option.replace(/([a-z])/, '')); // Remove option prefix
+        item.options = item.options.map(option => option.replace(/^\s*\([a-zA-Z0-9]\)\s*/, '')); // Remove option prefix
         return item;
     });
 };
 
 
-
 exports.generateTableWordFile = async (data, outputPath) => {
+    // console.log(data,"data is this")
     const doc = new Document({
         sections: [{
             properties: {},

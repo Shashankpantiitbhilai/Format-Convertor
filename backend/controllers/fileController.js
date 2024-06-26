@@ -34,3 +34,33 @@ exports.handleFileUpload = async (req, res) => {
         res.status(500).send(`Error processing file: ${err.message}`);
     }
 };
+
+
+exports.handleFileDelete = async (req, res) => {
+    try {
+        // Determine the output directory based on the environment
+        const outputDir = process.env.NODE_ENV === 'development' ? path.join(__dirname, '..', 'output') : '/tmp/output';
+console.log("reached handle delete")
+        // Check if the output directory exists
+        if (fs.existsSync(outputDir)) {
+            // Read all files in the directory
+            const files = fs.readdirSync(outputDir);
+
+            // Iterate through each file and delete it
+            files.forEach(file => {
+                const filePath = path.join(outputDir, file);
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            });
+        } else {
+            throw new Error('Output directory does not exist');
+        }
+
+        // Send a success response
+        res.json({ message: 'All files deleted successfully' });
+    } catch (err) {
+        console.error('Error in handleFileDelete:', err);
+        res.status(500).send(`Error deleting files: ${err.message}`);
+    }
+};

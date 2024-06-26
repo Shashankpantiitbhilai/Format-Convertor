@@ -43,6 +43,28 @@ const FileUpload = () => {
     setFile(e.target.files[0]);
     setDownloadLink("");
   };
+  const handleDownload = async () => {
+    setDownloadLink("");
+    const deleteFilesWithDelay = async () => {
+      const url =
+        process.env.NODE_ENV === "production"
+          ? "https://formatconvertorbackend-shashank-pants-projects.vercel.app/api/files/delete"
+          : "http://localhost:5000/api/files/delete";
+
+      try {
+        const res = await axios.delete(url);
+        console.log("File deletion response:", res.data);
+
+        // Handle response as needed
+      } catch (error) {
+        console.error("Error deleting files:", error.message);
+        // Handle error as needed
+      }
+    };
+
+    // Set a timeout to execute deleteFilesWithDelay after 10 seconds (10000 milliseconds)
+    setTimeout(deleteFilesWithDelay, 10000);
+  };
 
   const handleFileUpload = async () => {
     setLoading(true);
@@ -108,7 +130,7 @@ const FileUpload = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
               onClick={() => {
-                setDownloadLink("");
+             handleDownload()
               }}
               sx={{
                 backgroundColor: "orange",
