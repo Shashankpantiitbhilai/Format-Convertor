@@ -1,43 +1,93 @@
 const { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, BorderStyle, VerticalAlign } = require('docx');
 const fs = require('fs');
-
 exports.parseWordFile = (text) => {
-    const questions = text.split('\n').filter(line => line.trim() !== '');
+    const lines = text.split('\n');
     const formattedQuestions = [];
-
     let currentQuestion = null;
-
-    questions.forEach((line) => {
-        // Check if the line starts with a number followed by a period (e.g., "1. ", "2. ")
-        if (/^\s*\d+\.\s*/.test(line)) {
-            if (currentQuestion) {
-                formattedQuestions.push(currentQuestion);
-            }
-            // Remove numerical prefixes from questions (e.g., "1. ", "2. ")
-            let questionLine = line.replace(/^\s*\d+\.\s*/, '');
-            currentQuestion = { question: questionLine, options: [] };
-        } else if (currentQuestion) {
-            // Remove any character prefixes enclosed in parentheses (e.g., "(a)", "(b)")
-            let optionLine = line.replace(/^\s*\([a-zA-Z0-9]\)\s*/, '');
-            currentQuestion.options.push(optionLine);
+    let currentOption = null;
+    let optionStarted = false;
+console.log(lines)
+    const addCurrentOption = () => {
+        console.log(currentOption)
+        if (currentOption !== null && currentOption.trim()) {
+            currentQuestion.options.push(currentOption.trim());
+            currentOption = null;
         }
+    };
+
+    lines.forEach((line) => {
+        line = line.trim();
+        if (!line) return; // Skip empty lines
+
+        let i = 0;
+        while (i < line.length) {
+            // Check if the line starts with a number followed by a period (e.g., "1. ", "2. ")
+            if (/\d+\.\s*/.test(line.slice(i))) {
+                const match = line.slice(i).match(/^\d+\.\s*/);
+                if (match) {
+                    // If there's an ongoing question, push it to the formattedQuestions array
+                    if (currentQuestion) {
+                        addCurrentOption();
+                        formattedQuestions.push(currentQuestion);
+                    }
+                    // Initialize a new question object
+                    currentQuestion = { question: '', options: [] };
+                    currentOption = null;
+                    optionStarted = false;
+                    i += match[0].length;
+                    continue;
+                }
+            }
+
+            // Check if the line starts with an option prefix (e.g., "(a)", "(b)", "(c)", "(d)")
+            if (/\([a-d]\)\s*/.test(line.slice(i))) {
+                const match = line.slice(i).match(/^\([a-d]\)\s*/);
+                if (match) {
+                    if (optionStarted) {
+                        addCurrentOption();
+                    } else {
+                        optionStarted = true;
+                    }
+                    currentOption = '';
+                    i += match[0].length;
+                    continue;
+                }
+            }
+
+            // Append characters to the current option or question
+            if (optionStarted && currentOption !== null) {
+                currentOption += line[i];
+            } else if (currentQuestion) {
+                currentQuestion.question += line[i];
+            }
+
+            i++;
+        }
+
+        // Handle the end of the line
+        // if (currentOption !== null && currentOption.trim()) {
+        //     currentOption = currentOption.trim();
+        //     if (currentQuestion && currentQuestion.options.length < 4) {
+        //         currentQuestion.options.push(currentOption);
+        //     }
+        // }
     });
 
+    // Push the last question into the formattedQuestions array
     if (currentQuestion) {
+        addCurrentOption();
         formattedQuestions.push(currentQuestion);
     }
 
-    // Remove prefixes from each question and options array before returning
-    return formattedQuestions.map(item => {
-        item.question = item.question.replace(/^\d+\.\s*/, ''); // Remove question number prefix
-        item.options = item.options.map(option => option.replace(/^\s*\([a-zA-Z0-9]\)\s*/, '')); // Remove option prefix
-        return item;
-    });
+  
+
+
+    console.log(formattedQuestions, "formatted qyestions")
+    return formattedQuestions;
+
 };
-
-
 exports.generateTableWordFile = async (data, outputPath) => {
-    // console.log(data,"data is this")
+    
     const doc = new Document({
         sections: [{
             properties: {},
@@ -85,8 +135,6 @@ exports.generateTableWordFile = async (data, outputPath) => {
                         }),
                         // Options rows
                         ...item.options.map((option, optionIndex) => {
-                            const parts = option.split('\t');
-                            const optionText = parts[0] || "";
                             const isCorrect = optionIndex === 0; // First option is correct
 
                             return new TableRow({
@@ -97,7 +145,7 @@ exports.generateTableWordFile = async (data, outputPath) => {
                                         verticalAlign: VerticalAlign.CENTER,
                                     }),
                                     new TableCell({
-                                        children: [new Paragraph(optionText)],
+                                        children: [new Paragraph(option)],
                                         width: { size: 60, type: WidthType.PERCENTAGE },
                                     }),
                                     new TableCell({
