@@ -195,5 +195,6 @@ exports.generateTableWordFile = async (data, outputPath) => {
     });
 
     const buffer = await Packer.toBuffer(doc);
+ 
     fs.writeFileSync(outputPath, buffer);
 };

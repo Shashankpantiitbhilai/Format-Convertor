@@ -73,7 +73,7 @@ const FileUpload = () => {
 
   const handleFileUpload = async () => {
     setLoading(true);
-    setError(null); // Reset error state before starting the upload
+    setError(null);
     const formData = new FormData();
     formData.append("file", file);
     const url =
@@ -87,29 +87,42 @@ const FileUpload = () => {
         },
       });
       setDownloadLink(res.data.downloadLink);
-       const response = await fetch(
-         `${res.data.downloadLink}`
-       ); // Replace with your actual URL
-       const arrayBuffer = await response.arrayBuffer();
+      const response = await fetch(`${res.data.downloadLink}`);
+      const arrayBuffer = await response.arrayBuffer();
       const result = await mammoth.convertToHtml({ arrayBuffer });
-    
-      setDocContent(result.value); // 
-   
-    } catch (error) {
-      
 
-   
-      // Check if there is a response from the backend
+      // Add CSS for table styling
+      const styledHtml = `
+        <style>
+          table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 1em;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+          }
+          th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+          }
+        </style>
+        ${result.value}
+      `;
+
+      setDocContent(styledHtml);
+    } catch (error) {
       if (error.response && error.response.data) {
-        setError(error.response.data); // Update error state with backend error message
+        setError(error.response.data);
       } else {
-        setError("An unexpected error occurred."); // Fallback error message
+        setError("An unexpected error occurred.");
       }
     } finally {
       setLoading(false);
     }
   };
-
  
 
   return (

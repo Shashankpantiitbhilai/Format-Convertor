@@ -28,10 +28,14 @@ exports.handleFileUpload = async (req, res) => {
                 : `http://localhost:5000/output/${path.basename(outputFilePath)}`;
 
         // Read the generated DOCX content
-        const generatedDocContent = fs.readFileSync(outputFilePath, 'utf8');
-// console.log(generatedDocContent)
+        const generatedDocContent = fs.readFileSync(outputFilePath);
+
+        // Convert DOCX to HTML
+        const htmlResult = await mammoth.convertToHtml({ buffer: generatedDocContent });
+        const htmlContent = htmlResult.value;
+
         // Send JSON response with download link and generated document content
-        res.json({ downloadLink: downloadUrl, docContent: generatedDocContent });
+        res.json({ downloadLink: downloadUrl, docContent: htmlContent });
     } catch (err) {
         console.error('Error in handleFileUpload:', err);
         res.status(500).send(`Error processing file: ${err}`);
