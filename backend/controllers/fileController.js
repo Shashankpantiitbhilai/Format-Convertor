@@ -7,15 +7,17 @@ exports.handleFileUpload = async (req, res) => {
     try {
         const filePath = req.file.path;
         const result = await mammoth.extractRawText({ path: filePath });
+        console.log(result.value)
         const parsedData = parseWordFile(result.value);
 
         if (parsedData.length === 0) {
             throw new Error('No questions found in the document');
         }
+        // console.log(parsedData.length)
 
         // Use absolute path for output directory
-        
-        const outputDir = process.env.NODE_ENV === 'development' ? path.join(__dirname,'..', 'output') : '/tmp/output';
+
+        const outputDir = process.env.NODE_ENV === 'development' ? path.join(__dirname, '..', 'output') : '/tmp/output';
         if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, { recursive: true });
         }
@@ -31,7 +33,7 @@ exports.handleFileUpload = async (req, res) => {
         res.json({ downloadLink: downloadUrl });
     } catch (err) {
         console.error('Error in handleFileUpload:', err);
-        res.status(500).send(`Error processing file: ${err.message}`);
+        res.status(500).send(`Error processing file: ${err}`);
     }
 };
 
@@ -40,7 +42,7 @@ exports.handleFileDelete = async (req, res) => {
     try {
         // Determine the output directory based on the environment
         const outputDir = process.env.NODE_ENV === 'development' ? path.join(__dirname, '..', 'output') : '/tmp/output';
-console.log("reached handle delete")
+        console.log("reached handle delete")
         // Check if the output directory exists
         if (fs.existsSync(outputDir)) {
             // Read all files in the directory

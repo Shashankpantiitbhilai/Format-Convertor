@@ -38,11 +38,14 @@ const FileUpload = () => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [downloadLink, setDownloadLink] = useState("");
+  const [error, setError] = useState(null); // New error state
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
     setDownloadLink("");
+    setError(null); // Reset error state when a new file is selected
   };
+
   const handleDownload = async () => {
     setDownloadLink("");
     const deleteFilesWithDelay = async () => {
@@ -54,7 +57,6 @@ const FileUpload = () => {
       try {
         const res = await axios.delete(url);
         console.log("File deletion response:", res.data);
-
         // Handle response as needed
       } catch (error) {
         console.error("Error deleting files:", error.message);
@@ -68,6 +70,7 @@ const FileUpload = () => {
 
   const handleFileUpload = async () => {
     setLoading(true);
+    setError(null); // Reset error state before starting the upload
     const formData = new FormData();
     formData.append("file", file);
     const url =
@@ -83,7 +86,13 @@ const FileUpload = () => {
       setDownloadLink(res.data.downloadLink);
       console.log(res.data);
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error("Error uploading file:", error.response.data);
+      // Check if there is a response from the backend
+      if (error.response && error.response.data) {
+        setError(error.response.data); // Update error state with backend error message
+      } else {
+        setError("An unexpected error occurred."); // Fallback error message
+      }
     } finally {
       setLoading(false);
     }
@@ -112,7 +121,7 @@ const FileUpload = () => {
           onClick={handleFileUpload}
           disabled={!file || loading}
           component={motion.button}
-          style={{ backgroundColor: "white" ,color:"black"}}
+          style={{ backgroundColor: "white", color: "black" }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
@@ -130,7 +139,7 @@ const FileUpload = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
               onClick={() => {
-             handleDownload()
+                handleDownload();
               }}
               sx={{
                 backgroundColor: "orange",
@@ -140,6 +149,15 @@ const FileUpload = () => {
               Download Processed File
             </StyledButton>
           </Box>
+        )}
+        {error && (
+          <Typography
+            variant="body1"
+            color="error"
+            sx={{ fontWeight: "bold", marginTop: "20px" }}
+          >
+            {error}
+          </Typography>
         )}
       </StyledUploadContainer>
     </ThemeProvider>

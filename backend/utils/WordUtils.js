@@ -6,9 +6,9 @@ exports.parseWordFile = (text) => {
     let currentQuestion = null;
     let currentOption = null;
     let optionStarted = false;
-console.log(lines)
+    // console.log(lines, "lines")
     const addCurrentOption = () => {
-        console.log(currentOption)
+
         if (currentOption !== null && currentOption.trim()) {
             currentQuestion.options.push(currentOption.trim());
             currentOption = null;
@@ -17,6 +17,8 @@ console.log(lines)
 
     lines.forEach((line) => {
         line = line.trim();
+        console.log(currentQuestion, "current ques")
+        console.log(line, "line");
         if (!line) return; // Skip empty lines
 
         let i = 0;
@@ -53,6 +55,7 @@ console.log(lines)
                     continue;
                 }
             }
+            // console.log(currentQuestion, "ques")
 
             // Append characters to the current option or question
             if (optionStarted && currentOption !== null) {
@@ -79,15 +82,15 @@ console.log(lines)
         formattedQuestions.push(currentQuestion);
     }
 
-  
 
 
-    console.log(formattedQuestions, "formatted qyestions")
+
+    // console.log(formattedQuestions, "formatted qyestions")
     return formattedQuestions;
 
 };
 exports.generateTableWordFile = async (data, outputPath) => {
-    
+
     const doc = new Document({
         sections: [{
             properties: {},
