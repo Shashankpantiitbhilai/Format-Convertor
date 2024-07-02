@@ -150,16 +150,16 @@ const FileUpload = () => {
             </StyledButton>
           </Box>
         )}
-        {error && (
-          <Typography
-            variant="body1"
-            color="error"
-            sx={{ fontWeight: "bold", marginTop: "20px" }}
-          >
-            {error}
-          </Typography>
-        )}
       </StyledUploadContainer>
+      {error && (
+        <Typography
+          variant="body1"
+          color="error"
+          sx={{ fontWeight: "bold", marginTop: "20px" }}
+        >
+          {error}
+        </Typography>
+      )}
     </ThemeProvider>
   );
 };
