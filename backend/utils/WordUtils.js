@@ -5,89 +5,78 @@ exports.parseWordFile = (text) => {
     const formattedQuestions = [];
     let currentQuestion = null;
     let currentOption = null;
-    let optionStarted = false;
-    // console.log(lines, "lines")
-    const addCurrentOption = () => {
+    let questionText = '';
 
+    const addCurrentOption = () => {
         if (currentOption !== null && currentOption.trim()) {
             currentQuestion.options.push(currentOption.trim());
             currentOption = null;
         }
     };
 
+    const startNewQuestion = () => {
+        if (currentQuestion) {
+            addCurrentOption();
+            formattedQuestions.push(currentQuestion);
+        }
+        currentQuestion = { question: '', options: [] };
+        questionText = '';
+    };
+
+    const removeNumberPrefix = (text) => {
+        return text.replace(/^\d+\.\s*/, '').trim();
+    };
+
     lines.forEach((line) => {
         line = line.trim();
-        console.log(currentQuestion, "current ques")
-        console.log(line, "line");
         if (!line) return; // Skip empty lines
 
         let i = 0;
         while (i < line.length) {
-            // Check if the line starts with a number followed by a period (e.g., "1. ", "2. ")
-            if (/\d+\.\s*/.test(line.slice(i))) {
-                const match = line.slice(i).match(/^\d+\.\s*/);
-                if (match) {
-                    // If there's an ongoing question, push it to the formattedQuestions array
-                    if (currentQuestion) {
-                        addCurrentOption();
-                        formattedQuestions.push(currentQuestion);
-                    }
-                    // Initialize a new question object
-                    currentQuestion = { question: '', options: [] };
-                    currentOption = null;
-                    optionStarted = false;
-                    i += match[0].length;
-                    continue;
-                }
+            // Check for new question number
+            if (/^\d+\./.test(line.slice(i))) {
+                startNewQuestion();
+                questionText += line.slice(i);
+                break; // Move to next line
             }
 
             // Check if the line starts with an option prefix (e.g., "(a)", "(b)", "(c)", "(d)")
-            if (/\([a-d]\)\s*/.test(line.slice(i))) {
-                const match = line.slice(i).match(/^\([a-d]\)\s*/);
-                if (match) {
-                    if (optionStarted) {
-                        addCurrentOption();
-                    } else {
-                        optionStarted = true;
-                    }
-                    currentOption = '';
-                    i += match[0].length;
-                    continue;
+            if (/^\([a-d]\)/.test(line.slice(i))) {
+                if (!currentQuestion) {
+                    startNewQuestion();
                 }
+                if (questionText.trim() && currentQuestion.question === '') {
+                    currentQuestion.question = removeNumberPrefix(questionText.trim());
+                    questionText = '';
+                }
+                addCurrentOption();
+                currentOption = '';
+                i += 3; // Skip the option marker
+                continue;
             }
-            // console.log(currentQuestion, "ques")
 
-            // Append characters to the current option or question
-            if (optionStarted && currentOption !== null) {
+            // If no option prefix detected, append characters to question text or current option
+            if (currentOption !== null) {
                 currentOption += line[i];
-            } else if (currentQuestion) {
-                currentQuestion.question += line[i];
+            } else {
+                questionText += line[i];
             }
 
             i++;
         }
-
-        // Handle the end of the line
-        // if (currentOption !== null && currentOption.trim()) {
-        //     currentOption = currentOption.trim();
-        //     if (currentQuestion && currentQuestion.options.length < 4) {
-        //         currentQuestion.options.push(currentOption);
-        //     }
-        // }
     });
 
-    // Push the last question into the formattedQuestions array
+    // Handle any remaining content
     if (currentQuestion) {
+        if (questionText.trim()) {
+            currentQuestion.question += ' ' + removeNumberPrefix(questionText.trim());
+        }
         addCurrentOption();
         formattedQuestions.push(currentQuestion);
     }
 
-
-
-
-    // console.log(formattedQuestions, "formatted qyestions")
+    // console.log(formattedQuestions);
     return formattedQuestions;
-
 };
 exports.generateTableWordFile = async (data, outputPath) => {
 

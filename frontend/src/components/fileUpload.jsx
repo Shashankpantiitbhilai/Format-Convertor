@@ -88,7 +88,7 @@ const FileUpload = () => {
       });
       setDownloadLink(res.data.downloadLink);
        const response = await fetch(
-         `${downloadLink}`
+         `${res.data.downloadLink}`
        ); // Replace with your actual URL
        const arrayBuffer = await response.arrayBuffer();
       const result = await mammoth.convertToHtml({ arrayBuffer });
@@ -96,7 +96,9 @@ const FileUpload = () => {
       setDocContent(result.value); // 
    
     } catch (error) {
-      console.error("Error uploading file:", error.response.data);
+      
+
+   
       // Check if there is a response from the backend
       if (error.response && error.response.data) {
         setError(error.response.data); // Update error state with backend error message
