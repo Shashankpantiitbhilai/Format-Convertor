@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import mammoth from "mammoth";
 
 // Create a custom theme with green-yellow options
 const theme = createTheme({
@@ -39,11 +40,13 @@ const FileUpload = () => {
   const [loading, setLoading] = useState(false);
   const [downloadLink, setDownloadLink] = useState("");
   const [error, setError] = useState(null); // New error state
+  const [docContent, setDocContent] = useState(""); // New state to hold DOCX content
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
     setDownloadLink("");
     setError(null); // Reset error state when a new file is selected
+    setDocContent(""); // Reset DOCX content state
   };
 
   const handleDownload = async () => {
@@ -84,7 +87,14 @@ const FileUpload = () => {
         },
       });
       setDownloadLink(res.data.downloadLink);
-      console.log(res.data);
+       const response = await fetch(
+         `${downloadLink}`
+       ); // Replace with your actual URL
+       const arrayBuffer = await response.arrayBuffer();
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+    
+      setDocContent(result.value); // 
+   
     } catch (error) {
       console.error("Error uploading file:", error.response.data);
       // Check if there is a response from the backend
@@ -97,6 +107,8 @@ const FileUpload = () => {
       setLoading(false);
     }
   };
+
+ 
 
   return (
     <ThemeProvider theme={theme}>
@@ -111,7 +123,10 @@ const FileUpload = () => {
         </Typography>
         <TextField
           type="file"
-          onChange={handleFileChange}
+          onChange={(e) => {
+            handleFileChange(e);
+           
+          }}
           variant="outlined"
           inputProps={{ style: { padding: "10px" } }}
           sx={{ width: "300px", backgroundColor: "white", borderRadius: "4px" }}
@@ -160,6 +175,11 @@ const FileUpload = () => {
           {error}
         </Typography>
       )}
+      {docContent && (
+        <StyledDocContentContainer>
+          <div dangerouslySetInnerHTML={{ __html: docContent }} />
+        </StyledDocContentContainer>
+      )}
     </ThemeProvider>
   );
 };
@@ -184,6 +204,19 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
   "&:disabled": {
     backgroundColor: theme.palette.primary.light,
+  },
+}));
+
+const StyledDocContentContainer = styled(Box)(({ theme }) => ({
+  marginTop: "20px",
+  padding: "20px",
+  borderRadius: "10px",
+  backgroundColor: "white",
+  maxHeight: "400px",
+  overflowY: "auto",
+  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+  "& h1, h2, h3, h4, h5, h6": {
+    color: theme.palette.primary.main,
   },
 }));
 
