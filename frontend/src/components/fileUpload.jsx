@@ -44,6 +44,7 @@ const theme = createTheme({
 const FileUpload = () => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [downloadLink, setDownloadLink] = useState("");
   const [error, setError] = useState(null); // Error state for handling errors
   const [docContent, setDocContent] = useState(""); // State to hold converted DOCX content
@@ -84,7 +85,7 @@ const FileUpload = () => {
   // Function to handle file upload and conversion
   const handleFileUpload = async () => {
     setLoading(true); // Set loading state
-    setError(null); // Reset error state
+    setProgress(0); // Reset progress
 
     const formData = new FormData();
     formData.append("file", file);
@@ -96,12 +97,18 @@ const FileUpload = () => {
 
     try {
       // Upload file and get download link
-      const res = await axios.post(url, formData, {
+      const config = {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      });
+        onUploadProgress: (progressEvent) => {
+          const { loaded, total } = progressEvent;
+          const percentCompleted = Math.round((loaded * 100) / total);
+          setProgress(percentCompleted);
+        },
+      };
 
+      const res = await axios.post(url, formData, config);
       setDownloadLink(res.data.downloadLink); // Set download link
 
       // Fetch and convert DOCX content to HTML
@@ -139,6 +146,7 @@ const FileUpload = () => {
       }
     } finally {
       setLoading(false); // Reset loading state
+      setProgress(0); // Reset progress after completion
     }
   };
 
@@ -207,10 +215,44 @@ const FileUpload = () => {
                   },
                 }}
               >
-                {loading ? <CircularProgress size={24} /> : "Upload"}
+                {loading ? (
+                  <CircularProgress
+                    size={24}
+                    variant={progress > 0 ? "determinate" : "indeterminate"}
+                    value={progress}
+                  />
+                ) : (
+                  "Upload"
+                )}
               </Button>
+              {progress > 0 && (
+                <Typography variant="body2" color="textSecondary">
+                  {`${progress}% uploaded`}
+                </Typography>
+              )}
             </Paper>
           </Grid>
+          {downloadLink && (
+            <>
+              <Button
+                variant="contained"
+                startIcon={<GetAppIcon />}
+                onClick={handleDownload}
+                href={downloadLink}
+                sx={{
+                  marginTop: "10px",
+                  backgroundColor: theme.palette.secondary.dark,
+                  color: "white",
+                  size:"small",
+                  "&:hover": {
+                    backgroundColor: theme.palette.secondary.main,
+                  },
+                }}
+              >
+                Download Converted File
+              </Button>
+            </>
+          )}
           {downloadLink && (
             <Grid item xs={12}>
               <Paper
@@ -231,7 +273,14 @@ const FileUpload = () => {
             </Grid>
           )}
         </Grid>
-    
+        <Typography
+          variant="body2"
+          align="center"
+          color="textSecondary"
+          sx={{ marginTop: "20px" }}
+        >
+          Version 3.0
+        </Typography>
       </Container>
     </ThemeProvider>
   );
