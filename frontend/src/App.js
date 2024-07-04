@@ -45,6 +45,14 @@ function App() {
           <StyledHeading variant="h3" component="h1" style={{ color:"#EE4E4E"}}>
             EduGainer File Convertor
           </StyledHeading>
+          <Typography
+            variant="body2"
+            align="center"
+            color="textSecondary"
+            sx={{ marginTop: "20px" }}
+          >
+            Version 3.0
+          </Typography>
         </motion.div>
         <FileUpload />
       </RootContainer>

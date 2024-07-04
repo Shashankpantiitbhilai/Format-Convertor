@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import {
   Button,
   CircularProgress,
@@ -14,7 +14,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import mammoth from "mammoth";
 
-// Create a custom theme with green-yellow options
+// Custom theme configuration
 const theme = createTheme({
   palette: {
     primary: {
@@ -24,9 +24,6 @@ const theme = createTheme({
     secondary: {
       main: "#fbc02d", // Yellow color for secondary elements
       dark: "#c49000", // Dark yellow for secondary elements
-    },
-    error: {
-      main: "#f44336", // Red color for error states
     },
     background: {
       default: "#f0f0f0", // Light gray background color
@@ -48,18 +45,23 @@ const FileUpload = () => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [downloadLink, setDownloadLink] = useState("");
-  const [error, setError] = useState(null); // New error state
-  const [docContent, setDocContent] = useState(""); // New state to hold DOCX content
+  const [error, setError] = useState(null); // Error state for handling errors
+  const [docContent, setDocContent] = useState(""); // State to hold converted DOCX content
 
+  // Function to handle file selection
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
     setDownloadLink("");
-    setError(null); // Reset error state when a new file is selected
+    setError(null); // Reset error state on new file selection
     setDocContent(""); // Reset DOCX content state
   };
 
+  // Function to handle download link cleanup
   const handleDownload = async () => {
-    setDownloadLink("");
+    setDownloadLink(""); // Clear download link state
+
+    // Function to delete files after 10 seconds delay
     const deleteFilesWithDelay = async () => {
       const url =
         process.env.NODE_ENV === "production"
@@ -69,33 +71,40 @@ const FileUpload = () => {
       try {
         const res = await axios.delete(url);
         console.log("File deletion response:", res.data);
-        // Handle response as needed
+        // Handle deletion response as needed
       } catch (error) {
         console.error("Error deleting files:", error.message);
-        // Handle error as needed
+        // Handle deletion error as needed
       }
     };
 
-    // Set a timeout to execute deleteFilesWithDelay after 10 seconds (10000 milliseconds)
-    setTimeout(deleteFilesWithDelay, 10000);
+    setTimeout(deleteFilesWithDelay, 10000); // Set timeout for file deletion
   };
 
+  // Function to handle file upload and conversion
   const handleFileUpload = async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true); // Set loading state
+    setError(null); // Reset error state
+
     const formData = new FormData();
     formData.append("file", file);
+
     const url =
       process.env.NODE_ENV === "production"
         ? "https://formatconvertorbackend-shashank-pants-projects.vercel.app/api/files/upload"
         : "http://localhost:5000/api/files/upload";
+
     try {
+      // Upload file and get download link
       const res = await axios.post(url, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-      setDownloadLink(res.data.downloadLink);
+
+      setDownloadLink(res.data.downloadLink); // Set download link
+
+      // Fetch and convert DOCX content to HTML
       const response = await fetch(`${res.data.downloadLink}`);
       const arrayBuffer = await response.arrayBuffer();
       const result = await mammoth.convertToHtml({ arrayBuffer });
@@ -121,15 +130,15 @@ const FileUpload = () => {
         ${result.value}
       `;
 
-      setDocContent(styledHtml);
+      setDocContent(styledHtml); // Set converted DOCX content
     } catch (error) {
       if (error.response && error.response.data) {
-        setError(error.response.data);
+        setError(error.response.data); // Set error message from server response
       } else {
-        setError("An unexpected error occurred.");
+        setError("An unexpected error occurred."); // Set generic error message
       }
     } finally {
-      setLoading(false);
+      setLoading(false); // Reset loading state
     }
   };
 
@@ -159,9 +168,7 @@ const FileUpload = () => {
               </Typography>
               <input
                 type="file"
-                onChange={(e) => {
-                  handleFileChange(e);
-                }}
+                onChange={handleFileChange}
                 style={{ display: "none" }}
                 id="file-upload-input"
               />
@@ -224,6 +231,7 @@ const FileUpload = () => {
             </Grid>
           )}
         </Grid>
+    
       </Container>
     </ThemeProvider>
   );
