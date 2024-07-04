@@ -4,11 +4,14 @@ import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import {
   Button,
   CircularProgress,
-  TextField,
-  Box,
+  Container,
+  Grid,
+  Paper,
   Typography,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import GetAppIcon from "@mui/icons-material/GetApp";
 import mammoth from "mammoth";
 
 // Create a custom theme with green-yellow options
@@ -16,9 +19,11 @@ const theme = createTheme({
   palette: {
     primary: {
       main: "#388e3c", // Green color for primary elements
+      dark: "#2c6b2f", // Dark green for primary elements
     },
     secondary: {
       main: "#fbc02d", // Yellow color for secondary elements
+      dark: "#c49000", // Dark yellow for secondary elements
     },
     error: {
       main: "#f44336", // Red color for error states
@@ -31,6 +36,10 @@ const theme = createTheme({
     h4: {
       fontWeight: "bold",
       color: "orange",
+    },
+    h5: {
+      fontWeight: "bold",
+      color: "#388e3c",
     },
   },
 });
@@ -123,116 +132,101 @@ const FileUpload = () => {
       setLoading(false);
     }
   };
- 
 
   return (
     <ThemeProvider theme={theme}>
-      <StyledUploadContainer
-        component={motion.div}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Typography variant="h4" component="h1">
-          Upload your file
-        </Typography>
-        <TextField
-          type="file"
-          onChange={(e) => {
-            handleFileChange(e);
-           
-          }}
-          variant="outlined"
-          inputProps={{ style: { padding: "10px" } }}
-          sx={{ width: "300px", backgroundColor: "white", borderRadius: "4px" }}
-        />
-        <StyledButton
-          variant="contained"
-          onClick={handleFileUpload}
-          disabled={!file || loading}
-          component={motion.button}
-          style={{ backgroundColor: "white", color: "black" }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          {loading ? <CircularProgress size={24} /> : "Upload"}
-        </StyledButton>
-        {downloadLink && (
-          <Box mt={2}>
-            <StyledButton
-              variant="contained"
-              color="secondary"
-              href={downloadLink}
-              download
-              component={motion.a}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+      <Container maxWidth="lg" sx={{ marginTop: "50px" }}>
+        <Grid container spacing={3} justifyContent="center">
+          <Grid item xs={12} md={6}>
+            <Paper
+              component={motion.div}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              onClick={() => {
-                handleDownload();
-              }}
+              elevation={3}
               sx={{
-                backgroundColor: "orange",
-                "&:hover": { backgroundColor: "#e65100" },
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "20px",
+                padding: "20px",
+                borderRadius: "10px",
+                backgroundColor: theme.palette.background.default,
               }}
             >
-              Download Processed File
-            </StyledButton>
-          </Box>
-        )}
-      </StyledUploadContainer>
-      {error && (
-        <Typography
-          variant="body1"
-          color="error"
-          sx={{ fontWeight: "bold", marginTop: "20px" }}
-        >
-          {error}
-        </Typography>
-      )}
-      {docContent && (
-        <StyledDocContentContainer>
-          <div dangerouslySetInnerHTML={{ __html: docContent }} />
-        </StyledDocContentContainer>
-      )}
+              <Typography variant="h4" component="h1">
+                Upload Your File
+              </Typography>
+              <input
+                type="file"
+                onChange={(e) => {
+                  handleFileChange(e);
+                }}
+                style={{ display: "none" }}
+                id="file-upload-input"
+              />
+              <label htmlFor="file-upload-input">
+                <Button
+                  variant="contained"
+                  startIcon={<CloudUploadIcon />}
+                  component="span"
+                  size="large"
+                  sx={{
+                    backgroundColor: theme.palette.primary.main,
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: theme.palette.primary.dark,
+                    },
+                  }}
+                >
+                  Select File
+                </Button>
+              </label>
+              {file && (
+                <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                  Selected File: {file.name}
+                </Typography>
+              )}
+              <Button
+                variant="contained"
+                startIcon={<GetAppIcon />}
+                onClick={handleFileUpload}
+                disabled={!file || loading}
+                sx={{
+                  backgroundColor: theme.palette.secondary.dark,
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: theme.palette.secondary.main,
+                  },
+                }}
+              >
+                {loading ? <CircularProgress size={24} /> : "Upload"}
+              </Button>
+            </Paper>
+          </Grid>
+          {downloadLink && (
+            <Grid item xs={12}>
+              <Paper
+                sx={{
+                  marginTop: "20px",
+                  padding: "20px",
+                  borderRadius: "10px",
+                  backgroundColor: "white",
+                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                  width: "100%",
+                }}
+              >
+                <Typography variant="h5" gutterBottom>
+                  Converted HTML Content
+                </Typography>
+                <div dangerouslySetInnerHTML={{ __html: docContent }} />
+              </Paper>
+            </Grid>
+          )}
+        </Grid>
+      </Container>
     </ThemeProvider>
   );
 };
-
-const StyledUploadContainer = styled(Box)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "20px",
-  padding: "40px",
-  borderRadius: "10px",
-  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-  backgroundColor: theme.palette.primary.dark,
-  color: theme.palette.secondary.contrastText,
-}));
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  "&:hover": {
-    backgroundColor: theme.palette.primary.dark,
-  },
-  "&:disabled": {
-    backgroundColor: theme.palette.primary.light,
-  },
-}));
-
-const StyledDocContentContainer = styled(Box)(({ theme }) => ({
-  marginTop: "20px",
-  padding: "20px",
-  borderRadius: "10px",
-  backgroundColor: "white",
-  maxHeight: "400px",
-  overflowY: "auto",
-  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-  "& h1, h2, h3, h4, h5, h6": {
-    color: theme.palette.primary.main,
-  },
-}));
 
 export default FileUpload;
