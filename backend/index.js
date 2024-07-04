@@ -9,7 +9,7 @@ const dotenv = require("dotenv")
 dotenv.config();
 const origin =
     process.env.NODE_ENV === "production"
-        ? "https://formatconvertor.vercel.app"
+        ? "https://edugainers-format-test.vercel.app"
         : "http://localhost:3000";
 app.use(cors({
     origin,
