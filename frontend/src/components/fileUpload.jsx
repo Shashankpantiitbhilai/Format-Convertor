@@ -78,7 +78,11 @@ const FileUpload = () => {
         // Handle deletion error as needed
       }
     };
-
+    setFile("");
+    setProgress(0);
+    setDownloadLink("");
+    setError(null); // Reset error state on new file selection
+    setDocContent("");
     setTimeout(deleteFilesWithDelay, 10000); // Set timeout for file deletion
   };
 
@@ -243,7 +247,7 @@ const FileUpload = () => {
                   marginTop: "10px",
                   backgroundColor: theme.palette.secondary.dark,
                   color: "white",
-                  size:"small",
+                  size: "small",
                   "&:hover": {
                     backgroundColor: theme.palette.secondary.main,
                   },
