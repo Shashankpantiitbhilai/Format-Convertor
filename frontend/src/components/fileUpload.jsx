@@ -234,6 +234,14 @@ const FileUpload = () => {
                   {`${progress}% uploaded`}
                 </Typography>
               )}
+              {error && (
+                <Alert
+                  severity="error"
+                  sx={{ width: "100%", marginTop: "20px" }}
+                >
+                  {error}
+                </Alert>
+              )}
             </Paper>
           </Grid>
           {downloadLink && (
