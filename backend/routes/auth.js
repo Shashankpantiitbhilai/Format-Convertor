@@ -3,8 +3,8 @@ const router = express.Router();
 const passport = require('passport');
 const frontendUrl = process.env.NODE_ENV === "production"
     ? "https://edugainers-format-test.vercel.app"
-    : "http://localhost:3000/";
-const User=require("../models/user")
+    : "http://localhost:3000";
+const User = require("../models/user")
 // Route to start the authentication process
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
@@ -18,12 +18,12 @@ router.get('/google/callback',
             : "http://localhost:3000";
 
         // Prepare user info
-        console.log("ncjcnd",req.user)
+        console.log("ncjcnd", req.user)
         const userInfo = {
             id: req.user._id,
             name: req.user.username,
             email: req.user.email,
-          // Assuming you have a way to determine the user's role
+            // Assuming you have a way to determine the user's role
         };
 
         // Encode and stringify user info
@@ -49,13 +49,13 @@ router.get("/fetchAuth", function (req, res) {
 router.post('/updateCount', async (req, res) => {
     try {
         const userId = req.user._id;
-console.log(userId)
+        console.log(userId)
         // Find the user by ID and update uploadCount
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-console.log("user is",user)
+        console.log("user is", user)
         user.uploadCount -= 1;
         await user.save();
 

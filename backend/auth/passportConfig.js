@@ -7,7 +7,7 @@ console.log(process.env.GOOGLE_CLIENT_ID," ",process.env.GOOGLE_CLIENT_SECRET)
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/auth/google/callback"
+    callbackURL: "/https://formatconvertorbackend-shashank-pants-projects.vercel.app/auth/google/callback"
 },
     async function (accessToken, refreshToken, profile, done) {
         try {
