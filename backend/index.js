@@ -19,16 +19,40 @@ const origin = process.env.NODE_ENV === "production"
     : "http://localhost:3000";
 
 
+
+app.set('trust proxy', 1);
+
+// CORS configuration
 app.use(cors({
     origin,
     methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    
     credentials: true
 }));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.options('*', cors());
+
+// Connect to MongoDB
+connectDB();
+
+// Body parser middleware
+app.use(bodyParser.json({ limit: '100mb' }));
+app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
+
+// Session configuration
+app.use(session({
+    secret: 'keyboard cat', // Use environment variable for session secret
+    saveUninitialized: true, // Do not save uninitialized sessions
+    resave: false,
+    proxy: true,
+    cookie: {
+      secure: true, // Ensure cookies are only sent over HTTPS
+      httpOnly: true, // Cookies are not accessible via JavaScript
+      sameSite: 'none' // Allow cross-site cookies
+    }
+}));
+
+
 
 const outputDir = process.env.NODE_ENV === 'development'
     ? path.join('output')
