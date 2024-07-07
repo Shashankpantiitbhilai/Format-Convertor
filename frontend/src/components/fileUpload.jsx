@@ -223,9 +223,25 @@ const FileUpload = () => {
           <Container maxWidth="lg" sx={{ marginTop: "50px" }}>
             <Grid container spacing={3} justifyContent="center">
               <Grid item xs={12} md={6}>
-                <Alert severity="warning">
-                  You have exhausted your upload limit. Please contact support
-                  for further assistance.
+                <Alert
+                  severity="warning"
+                  sx={{
+                    backgroundColor: "#FFD700",
+                    color: "#333",
+                    borderRadius: "10px",
+                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  <Typography variant="h6" sx={{ marginBottom: "10px" }}>
+                    Upload Limit Exceeded
+                  </Typography>
+                  <Typography variant="body1" sx={{ marginBottom: "10px" }}>
+                    You have exhausted your upload limit.
+                  </Typography>
+                  <Typography variant="body2">
+                    Please contact support for further assistance at{" "}
+                    <strong>Call: 9997999765</strong>.
+                  </Typography>
                 </Alert>
               </Grid>
             </Grid>
@@ -320,7 +336,11 @@ const FileUpload = () => {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button href={ downloadLink} onClick={handleDownload} color="primary">
+            <Button
+              href={downloadLink}
+              onClick={handleDownload}
+              color="primary"
+            >
               Download File
             </Button>
             <Button onClick={handleCloseDialog} color="secondary">
