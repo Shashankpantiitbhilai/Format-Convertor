@@ -1,63 +1,32 @@
-import React from 'react';
-import { Typography, Container, createTheme, ThemeProvider } from '@mui/material';
-import { styled } from '@mui/system';
-import FileUpload from './components/fileUpload';
-import { motion } from 'framer-motion';
+import "./App.css";
+import React, { useEffect, useState, createContext } from "react";
+import { BrowserRouter } from "react-router-dom";
+import Main from "./main";
+import { fetchCredentials } from "./services/auth";
 
-// Create a custom theme with colorful options
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#3f51b5', // Purple color for primary elements
-    },
-    secondary: {
-      main: '#f50057', // Pink color for secondary elements
-    },
-    error: {
-      main: '#f44336', // Red color for error states
-    },
-    background: {
-      default: '#f0f0f0', // Light gray background color
-    },
-  },
-});
-
-const RootContainer = styled(Container)({
-  textAlign: 'center',
-  paddingTop: theme.spacing(4), // Use theme spacing directly
-});
-
-const StyledHeading = styled(Typography)({
-  color: '#d4af37', // Dark yellow color
-  fontWeight: 'bold',
-  marginBottom: theme.spacing(3),
-});
+const AdminContext = createContext();
 
 function App() {
+  const [IsUserLoggedIn, setIsUserLoggedIn] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCredentials().then((User) => {
+      if (User) {
+        setIsUserLoggedIn(User);
+      }
+      setIsLoading(false); // Set loading to false after fetching credentials
+    });
+  }, []);
+
   return (
-    <ThemeProvider theme={theme}>
-      <RootContainer>
-        <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <StyledHeading variant="h3" component="h1" style={{ color:"#EE4E4E"}}>
-            EduGainer File Convertor
-          </StyledHeading>
-          <Typography
-            variant="body2"
-            align="center"
-            color="textSecondary"
-            sx={{ marginTop: "20px" }}
-          >
-            Version 3.0
-          </Typography>
-        </motion.div>
-        <FileUpload />
-      </RootContainer>
-    </ThemeProvider>
+    <AdminContext.Provider value={{ IsUserLoggedIn, setIsUserLoggedIn, isLoading }}>
+      <BrowserRouter>
+        <Main />
+      </BrowserRouter>
+    </AdminContext.Provider>
   );
 }
 
+export { AdminContext };
 export default App;
