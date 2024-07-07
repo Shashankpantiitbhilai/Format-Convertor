@@ -320,7 +320,7 @@ const FileUpload = () => {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDownload} color="primary">
+            <Button href={ downloadLink} onClick={handleDownload} color="primary">
               Download File
             </Button>
             <Button onClick={handleCloseDialog} color="secondary">
