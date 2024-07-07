@@ -175,6 +175,12 @@ const FileUpload = () => {
       const updatecount = await UpdateUserCount();
       setRemainingUploads(updatecount.uploadCount);
       setDocContent(styledHtml);
+
+      // Open new window to display converted document content
+      const docWindow = window.open();
+      docWindow.document.open();
+      docWindow.document.write(styledHtml);
+      docWindow.document.close();
     } catch (error) {
       if (error.response && error.response.data) {
         setError(error.response.data);
@@ -301,40 +307,6 @@ const FileUpload = () => {
                     />
                   )}
                 </StyledPaper>
-              </Grid>
-            </Grid>
-            <Grid container spacing={3} justifyContent="center">
-              <Grid item xs={12} md={6}>
-                {downloadLink && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <StyledPaper elevation={3} sx={{ marginTop: "30px" }}>
-                      <Typography variant="h5" component="h2">
-                        Download Converted File
-                      </Typography>
-                      <Button
-                        variant="contained"
-                        startIcon={<GetAppIcon />}
-                        href={downloadLink}
-                        download
-                        size="large"
-                        sx={{
-                          backgroundColor: theme.palette.primary.main,
-                          color: "white",
-                          "&:hover": {
-                            backgroundColor: theme.palette.primary.dark,
-                          },
-                          mt: 2,
-                        }}
-                      >
-                        Download
-                      </Button>
-                    </StyledPaper>
-                  </motion.div>
-                )}
               </Grid>
             </Grid>
           </Container>
