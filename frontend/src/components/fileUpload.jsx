@@ -9,6 +9,11 @@ import {
   Paper,
   Typography,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -50,7 +55,7 @@ const RootContainer = styled(Container)({
   flexDirection: "column",
   alignItems: "center",
   marginTop: "50px",
-  backgroundColor: theme.palette.background.default, // Apply dark background to root container
+  backgroundColor: theme.palette.background.default,
 });
 
 const StyledHeading = styled(Typography)({
@@ -64,10 +69,10 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   borderRadius: "10px",
   backgroundColor: theme.palette.background.paper,
   textAlign: "center",
-  boxShadow: `0 8px 16px ${theme.palette.primary.dark}`, // Flashy box shadow
+  boxShadow: `0 8px 16px ${theme.palette.primary.dark}`,
   transition: "box-shadow 0.3s ease-in-out",
   "&:hover": {
-    boxShadow: `0 12px 20px ${theme.palette.primary.dark}`, // Adjusted shadow on hover
+    boxShadow: `0 12px 20px ${theme.palette.primary.dark}`,
   },
 }));
 
@@ -79,6 +84,8 @@ const FileUpload = () => {
   const [error, setError] = useState(null);
   const [docContent, setDocContent] = useState("");
   const [remainingUploads, setRemainingUploads] = useState(3);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [styledHtml, setStyledHtml] = useState("");
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -174,13 +181,8 @@ const FileUpload = () => {
 
       const updatecount = await UpdateUserCount();
       setRemainingUploads(updatecount.uploadCount);
-      setDocContent(styledHtml);
-
-      // Open new window to display converted document content
-      const docWindow = window.open();
-      docWindow.document.open();
-      docWindow.document.write(styledHtml);
-      docWindow.document.close();
+      setStyledHtml(styledHtml);
+      setOpenDialog(true);
     } catch (error) {
       if (error.response && error.response.data) {
         setError(error.response.data);
@@ -191,6 +193,14 @@ const FileUpload = () => {
       setLoading(false);
       setProgress(0);
     }
+  };
+
+  const handleViewFile = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
   };
 
   return (
@@ -288,29 +298,33 @@ const FileUpload = () => {
                     {loading ? (
                       <CircularProgress size={24} sx={{ color: "white" }} />
                     ) : (
-                      "Upload and Convert"
+                      "Upload File"
                     )}
                   </Button>
-                  {error && (
-                    <Alert
-                      severity="error"
-                      sx={{ width: "100%", marginTop: "10px" }}
-                    >
-                      {error}
-                    </Alert>
-                  )}
-                  {progress > 0 && progress < 100 && (
-                    <CircularProgress
-                      variant="determinate"
-                      value={progress}
-                      sx={{ marginTop: "10px" }}
-                    />
-                  )}
                 </StyledPaper>
               </Grid>
             </Grid>
           </Container>
         )}
+
+        <Dialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          fullWidth
+          maxWidth="md"
+        >
+          <DialogTitle>Styled HTML Content</DialogTitle>
+          <DialogContent dividers>
+            <DialogContentText>
+              <div dangerouslySetInnerHTML={{ __html: styledHtml }} />
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
       </RootContainer>
     </ThemeProvider>
   );

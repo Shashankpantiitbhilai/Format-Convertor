@@ -61,11 +61,11 @@ const outputDir = process.env.NODE_ENV === 'development'
 app.use('/output', express.static(outputDir));
 
 // Express session middleware
-app.use(session({
-    secret: 'your_secret_key',
-    resave: false,
-    saveUninitialized: true
-}));
+// app.use(session({
+//     secret: 'your_secret_key',
+//     resave: false,
+//     saveUninitialized: true
+// }));
 
 // Initialize Passport
 app.use(passport.initialize());
