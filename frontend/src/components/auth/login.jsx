@@ -31,7 +31,7 @@ function Login() {
     process.env.NODE_ENV === "production"
       ? "https://formatconvertorbackend-shashank-pants-projects.vercel.app"
       : "http://localhost:5000";
-
+console.log(backendUrl)
   const handleGoogleLogin = () => {
     window.location.href = `${backendUrl}/auth/google`;
   };

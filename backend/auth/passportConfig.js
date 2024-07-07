@@ -3,11 +3,18 @@ const dotenv = require("dotenv");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/user');
 dotenv.config();
-console.log(process.env.GOOGLE_CLIENT_ID," ",process.env.GOOGLE_CLIENT_SECRET)
+
+const callbackURL =
+    process.env.NODE_ENV === 'production'
+        ? "https://formatconvertorbackend-shashank-pants-projects.vercel.app/auth/google/callback"
+        : "http://localhost:5000/auth/google/callback";
+
+console.log(process.env.GOOGLE_CLIENT_ID, " ", process.env.GOOGLE_CLIENT_SECRET);
+
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://formatconvertorbackend-shashank-pants-projects.vercel.app/auth/google/callback"
+    callbackURL: callbackURL
 },
     async function (accessToken, refreshToken, profile, done) {
         try {
@@ -27,7 +34,8 @@ passport.use(new GoogleStrategy({
         } catch (err) {
             return done(err);
         }
-    }));
+    }
+));
 
 passport.serializeUser(function (user, done) {
     done(null, user.id);

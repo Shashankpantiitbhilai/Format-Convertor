@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const frontendUrl = process.env.NODE_ENV === "production"
-    ? "https://edugainers-format-test.vercel.app"
-    : "http://localhost:3000";
+
 const User = require("../models/user")
 // Route to start the authentication process
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
