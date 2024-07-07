@@ -19,16 +19,18 @@ import { fetchCredentials, UpdateUserCount } from "../services/auth";
 
 const theme = createTheme({
   palette: {
+    mode: "dark",
     primary: {
-      main: "#388e3c",
-      dark: "#2c6b2f",
+      main: "#90caf9",
+      dark: "#42a5f5",
     },
     secondary: {
-      main: "#fbc02d",
-      dark: "#c49000",
+      main: "#f48fb1",
+      dark: "#f06292",
     },
     background: {
-      default: "#f0f0f0",
+      default: "#303030",
+      paper: "#424242",
     },
   },
   typography: {
@@ -38,7 +40,7 @@ const theme = createTheme({
     },
     h5: {
       fontWeight: "bold",
-      color: "#388e3c",
+      color: "#90caf9",
     },
   },
 });
@@ -48,6 +50,7 @@ const RootContainer = styled(Container)({
   flexDirection: "column",
   alignItems: "center",
   marginTop: "50px",
+  backgroundColor: theme.palette.background.default, // Apply dark background to root container
 });
 
 const StyledHeading = styled(Typography)({
@@ -55,6 +58,18 @@ const StyledHeading = styled(Typography)({
   fontWeight: "bold",
   color: "#EE4E4E",
 });
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  padding: "20px",
+  borderRadius: "10px",
+  backgroundColor: theme.palette.background.paper,
+  textAlign: "center",
+  boxShadow: `0 8px 16px ${theme.palette.primary.dark}`, // Flashy box shadow
+  transition: "box-shadow 0.3s ease-in-out",
+  "&:hover": {
+    boxShadow: `0 12px 20px ${theme.palette.primary.dark}`, // Adjusted shadow on hover
+  },
+}));
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
@@ -173,25 +188,22 @@ const FileUpload = () => {
   };
 
   return (
-    <>
-      <ThemeProvider theme={theme}>
-        <RootContainer>
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <StyledHeading variant="h3" component="h1">
-              EduGainer File Converter
-            </StyledHeading>
-            <Typography variant="body2" align="center" color="textSecondary">
-              Version 3.0
-            </Typography>
-          </motion.div>
-        </RootContainer>
-      </ThemeProvider>
-      {remainingUploads === 0 && (
-        <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
+      <RootContainer>
+        <motion.div
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <StyledHeading variant="h3" component="h1">
+            EduGainer File Converter
+          </StyledHeading>
+          <Typography variant="body2" align="center" color="textSecondary">
+            Version 3.0
+          </Typography>
+        </motion.div>
+
+        {remainingUploads === 0 && (
           <Container maxWidth="lg" sx={{ marginTop: "50px" }}>
             <Grid container spacing={3} justifyContent="center">
               <Grid item xs={12} md={6}>
@@ -202,28 +214,18 @@ const FileUpload = () => {
               </Grid>
             </Grid>
           </Container>
-        </ThemeProvider>
-      )}
-      {remainingUploads > 0 && (
-        <ThemeProvider theme={theme}>
+        )}
+
+        {remainingUploads > 0 && (
           <Container maxWidth="lg" sx={{ marginTop: "50px" }}>
             <Grid container spacing={3} justifyContent="center">
               <Grid item xs={12} md={6}>
-                <Paper
+                <StyledPaper
                   component={motion.div}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5 }}
                   elevation={3}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "20px",
-                    padding: "20px",
-                    borderRadius: "10px",
-                    backgroundColor: theme.palette.background.default,
-                  }}
                 >
                   <Typography variant="h4" component="h1">
                     Upload Your File
@@ -249,13 +251,17 @@ const FileUpload = () => {
                         "&:hover": {
                           backgroundColor: theme.palette.primary.dark,
                         },
+                        mt: 2,
                       }}
                     >
                       Select File
                     </Button>
                   </label>
                   {file && (
-                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: "bold", mt: 2 }}
+                    >
                       Selected File: {file.name}
                     </Typography>
                   )}
@@ -270,6 +276,7 @@ const FileUpload = () => {
                       "&:hover": {
                         backgroundColor: theme.palette.secondary.main,
                       },
+                      mt: 2,
                     }}
                   >
                     {loading ? (
@@ -293,57 +300,47 @@ const FileUpload = () => {
                       sx={{ marginTop: "10px" }}
                     />
                   )}
-                </Paper>
+                </StyledPaper>
               </Grid>
             </Grid>
             <Grid container spacing={3} justifyContent="center">
-              <Grid item>
+              <Grid item xs={12} md={6}>
                 {downloadLink && (
-                  <Button
-                    variant="contained"
-                    href={downloadLink}
-                    onClick={handleDownload}
-                    startIcon={<GetAppIcon />}
-                    download
-                    size="large"
-                    sx={{
-                      backgroundColor: theme.palette.secondary.dark,
-                      color: "white",
-                      "&:hover": {
-                        backgroundColor: theme.palette.secondary.main,
-                      },
-                    }}
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
                   >
-                    Download Converted File
-                  </Button>
+                    <StyledPaper elevation={3} sx={{ marginTop: "30px" }}>
+                      <Typography variant="h5" component="h2">
+                        Download Converted File
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        startIcon={<GetAppIcon />}
+                        href={downloadLink}
+                        download
+                        size="large"
+                        sx={{
+                          backgroundColor: theme.palette.primary.main,
+                          color: "white",
+                          "&:hover": {
+                            backgroundColor: theme.palette.primary.dark,
+                          },
+                          mt: 2,
+                        }}
+                      >
+                        Download
+                      </Button>
+                    </StyledPaper>
+                  </motion.div>
                 )}
               </Grid>
             </Grid>
-            {docContent && (
-              <Grid container spacing={3} justifyContent="center">
-                <Grid item xs={12} md={8}>
-                  <Paper
-                    component={motion.div}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
-                    elevation={3}
-                    sx={{
-                      padding: "20px",
-                      marginTop: "20px",
-                      borderRadius: "10px",
-                      backgroundColor: theme.palette.background.paper,
-                    }}
-                  >
-                    <div dangerouslySetInnerHTML={{ __html: docContent }} />
-                  </Paper>
-                </Grid>
-              </Grid>
-            )}
           </Container>
-        </ThemeProvider>
-      )}
-    </>
+        )}
+      </RootContainer>
+    </ThemeProvider>
   );
 };
 

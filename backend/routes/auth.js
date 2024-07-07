@@ -16,7 +16,7 @@ router.get('/google/callback',
             : "http://localhost:3000";
 
         // Prepare user info
-        console.log("ncjcnd", req.user)
+        // console.log("ncjcnd", req.user)
         const userInfo = {
             id: req.user._id,
             name: req.user.username,
@@ -53,7 +53,7 @@ router.post('/updateCount', async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-        console.log("user is", user)
+        // console.log("user is", user)
         user.uploadCount -= 1;
         await user.save();
 

@@ -9,7 +9,7 @@ const callbackURL =
         ? "https://formatconvertorbackend-shashank-pants-projects.vercel.app/auth/google/callback"
         : "http://localhost:5000/auth/google/callback";
 
-console.log(callbackURL);
+// console.log(callbackURL);
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
