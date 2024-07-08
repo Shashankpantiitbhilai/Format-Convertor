@@ -46,9 +46,9 @@ app.use(session({
     resave: false,
     proxy: true,
     cookie: {
-      secure: true, // Ensure cookies are only sent over HTTPS
-      httpOnly: true, // Cookies are not accessible via JavaScript
-      sameSite: 'none' // Allow cross-site cookies
+        secure: true, // Ensure cookies are only sent over HTTPS
+        httpOnly: true, // Cookies are not accessible via JavaScript
+        sameSite: 'none' // Allow cross-site cookies
     }
 }));
 

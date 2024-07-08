@@ -1,11 +1,11 @@
 const { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, BorderStyle, VerticalAlign } = require('docx');
 const fs = require('fs');
 exports.parseWordFile = (text) => {
-    const lines = text.split('\n');
-    const formattedQuestions = [];
-    let currentQuestion = null;
-    let currentOption = null;
-    let questionText = '';
+    const lines = text.split('\n'); // Split the input text into lines.
+    const formattedQuestions = []; // Array to hold the formatted questions.
+    let currentQuestion = null; // Variable to hold the current question being processed.
+    let currentOption = null; // Variable to hold the current option being processed.
+    let questionText = ''; // Variable to accumulate question text.
 
     const addCurrentOption = () => {
         if (currentOption !== null && currentOption.trim()) {
@@ -31,38 +31,29 @@ exports.parseWordFile = (text) => {
         line = line.trim();
         if (!line) return; // Skip empty lines
 
-        let i = 0;
-        while (i < line.length) {
-            // Check for new question number
-            if (/^\d+\./.test(line.slice(i))) {
-                startNewQuestion();
-                questionText += line.slice(i);
-                break; // Move to next line
-            }
-
-            // Check if the line starts with an option prefix (e.g., "(a)", "(b)", "(c)", "(d)")
-            if (/^\([a-d]\)/.test(line.slice(i))) {
-                if (!currentQuestion) {
-                    startNewQuestion();
-                }
-                if (questionText.trim() && currentQuestion.question === '') {
-                    currentQuestion.question = removeNumberPrefix(questionText.trim());
-                    questionText = '';
-                }
-                addCurrentOption();
-                currentOption = '';
-                i += 3; // Skip the option marker
-                continue;
-            }
-
-            // If no option prefix detected, append characters to question text or current option
-            if (currentOption !== null) {
-                currentOption += line[i];
+        if (/^\d+\.\s/.test(line)) { // New question detected
+            if (currentQuestion && currentQuestion.options.length === 0) { // No options detected yet
+                questionText += ' ' + line;
             } else {
-                questionText += line[i];
+                startNewQuestion();
+                questionText += line;
             }
-
-            i++;
+        } else if (/^\([a-d]\)/.test(line)) { // New option detected
+            if (!currentQuestion) {
+                startNewQuestion();
+            }
+            if (questionText.trim() && currentQuestion.question === '') {
+                currentQuestion.question = removeNumberPrefix(questionText.trim());
+                questionText = '';
+            }
+            addCurrentOption();
+            currentOption = line.slice(3).trim(); // Start new option
+        } else { // Continue current question or option
+            if (currentOption !== null) {
+                currentOption += ' ' + line;
+            } else {
+                questionText += ' ' + line;
+            }
         }
     });
 
@@ -75,9 +66,9 @@ exports.parseWordFile = (text) => {
         formattedQuestions.push(currentQuestion);
     }
 
-    // console.log(formattedQuestions);
     return formattedQuestions;
 };
+
 exports.generateTableWordFile = async (data, outputPath) => {
 
     const doc = new Document({
