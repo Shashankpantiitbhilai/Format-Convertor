@@ -383,7 +383,9 @@ const FileUpload = () => {
               <Button
                 variant="contained"
                 startIcon={<GetAppIcon />}
+                href={downloadLink}
                 onClick={handleDownload}
+
                 size="large"
                 sx={{
                   backgroundColor: theme.palette.secondary.main,
