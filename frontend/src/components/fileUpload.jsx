@@ -18,6 +18,7 @@ import {
 import { motion } from "framer-motion";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import GetAppIcon from "@mui/icons-material/GetApp";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import mammoth from "mammoth";
 import { styled } from "@mui/system";
 import { fetchCredentials, UpdateUserCount } from "../services/auth";
@@ -195,8 +196,11 @@ const FileUpload = () => {
     }
   };
 
-  const handleViewFile = () => {
-    setOpenDialog(true);
+  const handleClear = () => {
+    setFile(null);
+    setDownloadLink("");
+    setError(null);
+    setDocContent("");
   };
 
   const handleCloseDialog = () => {
@@ -297,53 +301,103 @@ const FileUpload = () => {
                       Selected File: {file.name}
                     </Typography>
                   )}
+                  {file && (
+                    <Button
+                      variant="contained"
+                      startIcon={<RefreshIcon />}
+                      onClick={handleClear}
+                      size="large"
+                      sx={{
+                        backgroundColor: "#f06292",
+                        color: "white",
+                        "&:hover": {
+                          backgroundColor: "#ec407a",
+                        },
+                        mt: 2,
+                        ml: 2,
+                      }}
+                    >
+                      Refresh
+                    </Button>
+                  )}
                   <Button
                     variant="contained"
-                    startIcon={<GetAppIcon />}
+                    startIcon={
+                      loading ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        <CloudUploadIcon />
+                      )
+                    }
                     onClick={handleFileUpload}
                     disabled={!file || loading}
+                    size="large"
                     sx={{
-                      backgroundColor: theme.palette.secondary.dark,
+                      backgroundColor: theme.palette.primary.main,
                       color: "white",
                       "&:hover": {
-                        backgroundColor: theme.palette.secondary.main,
+                        backgroundColor: theme.palette.primary.dark,
                       },
                       mt: 2,
                     }}
                   >
-                    {loading ? (
-                      <CircularProgress size={24} sx={{ color: "white" }} />
-                    ) : (
-                      "Upload File"
-                    )}
+                    {loading ? "Uploading..." : "Upload"}
                   </Button>
+                  {progress > 0 && (
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: "bold", mt: 2 }}
+                    >
+                      Upload Progress: {progress}%
+                    </Typography>
+                  )}
+
+                  {error && (
+                    <Typography
+                      variant="body1"
+                      color="error"
+                      sx={{ fontWeight: "bold", mt: 2 }}
+                    >
+                      Error: {error}
+                    </Typography>
+                  )}
                 </StyledPaper>
               </Grid>
             </Grid>
           </Container>
         )}
 
-        <Dialog
-          open={openDialog}
-          onClose={handleCloseDialog}
-          fullWidth
-          maxWidth="md"
-        >
-          <DialogTitle>Styled HTML Content</DialogTitle>
-          <DialogContent dividers>
+        <Dialog open={openDialog} onClose={handleCloseDialog}>
+          <DialogTitle>File Preview</DialogTitle>
+          <DialogContent>
             <DialogContentText>
-              <div dangerouslySetInnerHTML={{ __html: styledHtml }} />
+              Below is a preview of the converted file:
             </DialogContentText>
+            <div
+              dangerouslySetInnerHTML={{ __html: styledHtml }}
+              style={{ maxHeight: "400px", overflowY: "auto" }}
+            ></div>
           </DialogContent>
           <DialogActions>
-            <Button
-              href={downloadLink}
-              onClick={handleDownload}
-              color="primary"
-            >
-              Download File
-            </Button>
-            <Button onClick={handleCloseDialog} color="secondary">
+            {downloadLink && (
+              <Button
+                variant="contained"
+                startIcon={<GetAppIcon />}
+                onClick={handleDownload}
+                size="large"
+                sx={{
+                  backgroundColor: theme.palette.secondary.main,
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: theme.palette.secondary.dark,
+                  },
+                  mt: 2,
+                }}
+              >
+                Download File
+              </Button>
+            )}
+            <Button onClick={handleCloseDialog} color="primary">
               Close
             </Button>
           </DialogActions>

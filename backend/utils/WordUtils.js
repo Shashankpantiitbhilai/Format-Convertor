@@ -6,7 +6,7 @@ exports.parseWordFile = (text) => {
     let currentQuestion = null; // Variable to hold the current question being processed.
     let currentOption = null; // Variable to hold the current option being processed.
     let questionText = ''; // Variable to accumulate question text.
-
+    console.log("lines", lines)
     const addCurrentOption = () => {
         if (currentOption !== null && currentOption.trim()) {
             currentQuestion.options.push(currentOption.trim());
@@ -186,6 +186,6 @@ exports.generateTableWordFile = async (data, outputPath) => {
     });
 
     const buffer = await Packer.toBuffer(doc);
- 
+
     fs.writeFileSync(outputPath, buffer);
 };
