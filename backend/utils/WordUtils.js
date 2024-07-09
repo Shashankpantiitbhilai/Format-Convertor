@@ -7,7 +7,7 @@ exports.parseWordFile = (text) => {
     let currentQuestion = null;
     let currentOption = null;
     let questionText = '';
-
+    // console.log(lines)
     const addCurrentOption = () => {
         if (currentOption !== null && currentOption.trim()) {
             currentQuestion.options.push(currentOption.trim());
@@ -45,7 +45,7 @@ exports.parseWordFile = (text) => {
                 questionText = '';
             }
             addCurrentOption();
-            currentOption = element.slice(3).trim();
+            currentOption = element.slice(3).trim(); // Start new option, removing (a), (b), etc.
         } else { // Continue current question or option
             if (currentOption !== null) {
                 currentOption += ' ' + element;
@@ -55,12 +55,14 @@ exports.parseWordFile = (text) => {
         }
     };
 
+
     lines.forEach((line) => {
         line = line.trim();
         if (!line) return; // Skip empty lines
 
-        const elements = line.split(/\s(?=\d+\.\s|\([a-d]\))/);
-        // console.log(elements)// Split line by space followed by new question or new option pattern
+        // Split on a pattern that matches one or more digits followed by a period, or letters in parentheses
+        const elements = line.split(/(?=\b\d+\.\s*|\([a-d]\))/);
+        // console.log(elements); // Adjusted splitting regex
         elements.forEach(handleElement);
     });
 
@@ -75,6 +77,7 @@ exports.parseWordFile = (text) => {
 
     return formattedQuestions;
 };
+
 
 exports.generateTableWordFile = async (data, outputPath) => {
     const doc = new Document({
