@@ -47,7 +47,7 @@ router.get("/fetchAuth", function (req, res) {
 router.post('/updateCount', async (req, res) => {
     try {
         const userId = req.user._id;
-        console.log(userId)
+        // console.log(userId)
         // Find the user by ID and update uploadCount
         const user = await User.findById(userId);
         if (!user) {
