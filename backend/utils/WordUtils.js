@@ -2,16 +2,15 @@ const { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, Alig
 const fs = require('fs');
 
 exports.parseWordFile = (text) => {
-    const lines = text.split('\n'); // Split the input text into lines.
-    const formattedQuestions = []; // Array to hold the formatted questions.
-    let currentQuestion = null; // Variable to hold the current question being processed.
-    let currentOption = null; // Variable to hold the current option being processed.
-    let questionText = ''; // Variable to accumulate question text.
-    let currentOptionKey = ''; // Variable to track the current option key (a, b, c, d)
+    const lines = text.split('\n');
+    const formattedQuestions = [];
+    let currentQuestion = null;
+    let currentOption = null;
+    let questionText = '';
 
     const addCurrentOption = () => {
         if (currentOption !== null && currentOption.trim()) {
-            currentQuestion.options[currentOptionKey] = currentOption.trim();
+            currentQuestion.options.push(currentOption.trim());
             currentOption = null;
         }
     };
@@ -21,7 +20,7 @@ exports.parseWordFile = (text) => {
             addCurrentOption();
             formattedQuestions.push(currentQuestion);
         }
-        currentQuestion = { question: '', options: {} };
+        currentQuestion = { question: '', options: [] };
         questionText = '';
     };
 
@@ -31,7 +30,7 @@ exports.parseWordFile = (text) => {
 
     const handleElement = (element) => {
         if (/^\d+\.\s/.test(element)) { // New question detected
-            if (currentQuestion && Object.keys(currentQuestion.options).length === 0) { // No options detected yet
+            if (currentQuestion && currentQuestion.options.length === 0) { // No options detected yet
                 questionText += ' ' + element;
             } else {
                 startNewQuestion();
@@ -46,8 +45,7 @@ exports.parseWordFile = (text) => {
                 questionText = '';
             }
             addCurrentOption();
-            currentOptionKey = element.charAt(1);
-            currentOption = element.slice(3).trim(); // Start new option
+            currentOption = element.slice(3).trim();
         } else { // Continue current question or option
             if (currentOption !== null) {
                 currentOption += ' ' + element;
@@ -61,7 +59,8 @@ exports.parseWordFile = (text) => {
         line = line.trim();
         if (!line) return; // Skip empty lines
 
-        const elements = line.split(/(?=\d+\.\s)|(?=\([a-d]\))/); // Split line by new question or new option
+        const elements = line.split(/\s(?=\d+\.\s|\([a-d]\))/);
+        // console.log(elements)// Split line by space followed by new question or new option pattern
         elements.forEach(handleElement);
     });
 
@@ -124,7 +123,7 @@ exports.generateTableWordFile = async (data, outputPath) => {
                             ],
                         }),
                         // Options rows
-                        ...Object.entries(item.options).map(([key, option], optionIndex) => {
+                        ...item.options.map((option, optionIndex) => {
                             const isCorrect = optionIndex === 0; // First option is correct
 
                             return new TableRow({
