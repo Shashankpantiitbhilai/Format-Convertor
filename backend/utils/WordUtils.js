@@ -1,15 +1,17 @@
 const { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, BorderStyle, VerticalAlign } = require('docx');
 const fs = require('fs');
+
 exports.parseWordFile = (text) => {
     const lines = text.split('\n'); // Split the input text into lines.
     const formattedQuestions = []; // Array to hold the formatted questions.
     let currentQuestion = null; // Variable to hold the current question being processed.
     let currentOption = null; // Variable to hold the current option being processed.
     let questionText = ''; // Variable to accumulate question text.
-    console.log("lines", lines)
+    let currentOptionKey = ''; // Variable to track the current option key (a, b, c, d)
+
     const addCurrentOption = () => {
         if (currentOption !== null && currentOption.trim()) {
-            currentQuestion.options.push(currentOption.trim());
+            currentQuestion.options[currentOptionKey] = currentOption.trim();
             currentOption = null;
         }
     };
@@ -19,7 +21,7 @@ exports.parseWordFile = (text) => {
             addCurrentOption();
             formattedQuestions.push(currentQuestion);
         }
-        currentQuestion = { question: '', options: [] };
+        currentQuestion = { question: '', options: {} };
         questionText = '';
     };
 
@@ -27,18 +29,15 @@ exports.parseWordFile = (text) => {
         return text.replace(/^\d+\.\s*/, '').trim();
     };
 
-    lines.forEach((line) => {
-        line = line.trim();
-        if (!line) return; // Skip empty lines
-
-        if (/^\d+\.\s/.test(line)) { // New question detected
-            if (currentQuestion && currentQuestion.options.length === 0) { // No options detected yet
-                questionText += ' ' + line;
+    const handleElement = (element) => {
+        if (/^\d+\.\s/.test(element)) { // New question detected
+            if (currentQuestion && Object.keys(currentQuestion.options).length === 0) { // No options detected yet
+                questionText += ' ' + element;
             } else {
                 startNewQuestion();
-                questionText += line;
+                questionText += element;
             }
-        } else if (/^\([a-d]\)/.test(line)) { // New option detected
+        } else if (/^\([a-d]\)/.test(element)) { // New option detected
             if (!currentQuestion) {
                 startNewQuestion();
             }
@@ -47,14 +46,23 @@ exports.parseWordFile = (text) => {
                 questionText = '';
             }
             addCurrentOption();
-            currentOption = line.slice(3).trim(); // Start new option
+            currentOptionKey = element.charAt(1);
+            currentOption = element.slice(3).trim(); // Start new option
         } else { // Continue current question or option
             if (currentOption !== null) {
-                currentOption += ' ' + line;
+                currentOption += ' ' + element;
             } else {
-                questionText += ' ' + line;
+                questionText += ' ' + element;
             }
         }
+    };
+
+    lines.forEach((line) => {
+        line = line.trim();
+        if (!line) return; // Skip empty lines
+
+        const elements = line.split(/(?=\d+\.\s)|(?=\([a-d]\))/); // Split line by new question or new option
+        elements.forEach(handleElement);
     });
 
     // Handle any remaining content
@@ -70,7 +78,6 @@ exports.parseWordFile = (text) => {
 };
 
 exports.generateTableWordFile = async (data, outputPath) => {
-
     const doc = new Document({
         sections: [{
             properties: {},
@@ -117,7 +124,7 @@ exports.generateTableWordFile = async (data, outputPath) => {
                             ],
                         }),
                         // Options rows
-                        ...item.options.map((option, optionIndex) => {
+                        ...Object.entries(item.options).map(([key, option], optionIndex) => {
                             const isCorrect = optionIndex === 0; // First option is correct
 
                             return new TableRow({
@@ -186,6 +193,5 @@ exports.generateTableWordFile = async (data, outputPath) => {
     });
 
     const buffer = await Packer.toBuffer(doc);
-
     fs.writeFileSync(outputPath, buffer);
 };
