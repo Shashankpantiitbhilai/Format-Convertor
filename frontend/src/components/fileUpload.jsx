@@ -216,7 +216,7 @@ const FileUpload = () => {
           transition={{ duration: 0.5 }}
         >
           <StyledHeading variant="h3" component="h1">
-            EduGainer File Converter
+            EduGainer's File Converter
           </StyledHeading>
           <Typography variant="body2" align="center" color="textSecondary">
             Version 3.0
