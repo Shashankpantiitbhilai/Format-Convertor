@@ -12,13 +12,11 @@ dotenv.config();
 
 const app = express();
 const PORT = 5000;
-connectDB()
+connectDB();
 
 const origin = process.env.NODE_ENV === "production"
     ? "https://edugainers-format-test.vercel.app"
     : "http://localhost:3000";
-
-
 
 app.set('trust proxy', 1);
 
@@ -40,32 +38,31 @@ app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 // Session configuration
-app.use(session({
-    secret: 'keyboard cat', // Use environment variable for session secret
-    saveUninitialized: true, // Do not save uninitialized sessions
-    resave: false,
-    proxy: true,
-    cookie: {
-        secure: true, // Ensure cookies are only sent over HTTPS
-        httpOnly: true, // Cookies are not accessible via JavaScript
-        sameSite: 'none' // Allow cross-site cookies
-    }
-}));
-
-
+if (process.env.NODE_ENV === 'development') {
+    app.use(session({
+        secret: 'keyboard cat', // Use environment variable for session secret
+        saveUninitialized: true, // Do not save uninitialized sessions
+        resave: false
+    }));
+} else {
+    app.use(session({
+        secret: 'keyboard cat', // Use environment variable for session secret
+        saveUninitialized: true, // Do not save uninitialized sessions
+        resave: false,
+        proxy: true,
+        cookie: {
+            secure: true, // Ensure cookies are only sent over HTTPS
+            httpOnly: true, // Cookies are not accessible via JavaScript
+            sameSite: 'none' // Allow cross-site cookies
+        }
+    }));
+}
 
 const outputDir = process.env.NODE_ENV === 'development'
     ? path.join('output')
     : '/tmp/output';
 
 app.use('/output', express.static(outputDir));
-
-// Express session middleware
-// app.use(session({
-//     secret: 'your_secret_key',
-//     resave: false,
-//     saveUninitialized: true
-// }));
 
 // Initialize Passport
 app.use(passport.initialize());

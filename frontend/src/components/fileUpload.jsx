@@ -244,7 +244,7 @@ const FileUpload = () => {
                   </Typography>
                   <Typography variant="body2">
                     Please contact support for further assistance at{" "}
-                    <strong>Call: 9997999765</strong>.
+                    <strong>Call: 9997999768/ 9997999765</strong>.
                   </Typography>
                 </Alert>
               </Grid>
